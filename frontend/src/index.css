@@ -5,23 +5,25 @@
 }
 
 :root {
-  --bg:           #07102b;
-  --card:         #0c1d50;
-  --card-alt:     #091440;
-  --card-border:  rgba(72, 120, 240, 0.22);
+  --bg:           #eef2fc;
+  --card:         #ffffff;
+  --card-alt:     #f4f7ff;
+  --card-border:  rgba(61, 110, 232, 0.15);
   --royal:        #3d6ee8;
-  --royal-light:  #6690f0;
+  --royal-light:  #5580ee;
   --royal-dark:   #1e3fa8;
-  --gold:         #d4af37;
-  --gold-light:   #f0cf65;
-  --gold-dark:    #a8861a;
-  --gold-grad:    linear-gradient(135deg, #b8860b 0%, #f0cf65 50%, #c49b1e 100%);
-  --gold-grad-btn: linear-gradient(135deg, #c49b1e 0%, #f5d060 100%);
-  --input-bg:     #081230;
-  --input-border: #1a3070;
-  --text:         #dde7ff;
-  --text-2:       #7899d4;
-  --text-3:       #3d5999;
+  --gold:         #b8860b;
+  --gold-light:   #c49b1e;
+  --gold-dark:    #7a5c00;
+  --gold-grad:    linear-gradient(135deg, #7a5c00 0%, #c49b1e 50%, #8a6800 100%);
+  --gold-grad-btn: linear-gradient(135deg, #9a7000 0%, #d4af37 100%);
+  --input-bg:     #f4f7ff;
+  --input-border: #c4d0ee;
+  --text:         #0d1b42;
+  --text-2:       #3a58a0;
+  --text-3:       #7a90c0;
+  --entry-bg:     rgba(61, 110, 232, 0.04);
+  --shadow:       0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08);
 }
 
 body {

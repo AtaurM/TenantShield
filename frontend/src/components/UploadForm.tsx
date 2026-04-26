@@ -200,7 +200,7 @@ export default function UploadForm({ onSubmit, loading }: Props) {
             <img src={preview} alt="Uploaded issue" className="w-full max-h-64 object-contain" style={{ background: "var(--input-bg)" }} />
             <button type="button" onClick={clearImage}
               className="absolute top-2 right-2 rounded-full w-7 h-7 flex items-center justify-center transition-colors"
-              style={{ background: "rgba(0,0,20,0.7)", color: "var(--text)", border: "1px solid var(--input-border)" }}
+              style={{ background: "rgba(0,0,0,0.55)", color: "#fff", border: "none" }}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

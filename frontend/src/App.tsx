@@ -89,21 +89,23 @@ export default function App() {
 
   return (
     <div className="min-h-screen px-6 py-10" style={{ background: "var(--bg)" }}>
-      <div className="pointer-events-none fixed inset-0" style={{ background: "radial-gradient(ellipse 70% 35% at 50% -5%, rgba(61,110,232,0.38) 0%, transparent 68%)" }} />
+      <div className="pointer-events-none fixed inset-0" style={{ background: "radial-gradient(ellipse 70% 35% at 50% -5%, rgba(61,110,232,0.1) 0%, transparent 68%)" }} />
       <div className="relative w-full max-w-6xl mx-auto">
 
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="flex justify-center mb-5" style={{ filter: "drop-shadow(0 0 20px rgba(61,110,232,0.55)) drop-shadow(0 0 8px rgba(212,175,55,0.35))" }}>
-            <ShieldLogo size={76} />
-          </div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4 border" style={{ background: "rgba(212,175,55,0.1)", borderColor: "rgba(212,175,55,0.3)", color: "var(--gold-light)" }}>
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5 border" style={{ background: "rgba(184,134,11,0.1)", borderColor: "rgba(184,134,11,0.3)", color: "var(--gold)" }}>
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg>
             NYC Housing Rights
           </div>
-          <h1 className="font-cinzel text-5xl font-black tracking-tight leading-tight" style={{ color: "var(--text)" }}>
-            Tenant<span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gold-grad)" }}>Shield</span>
-          </h1>
+          <div className="flex items-center justify-center gap-4">
+            <div style={{ filter: "drop-shadow(0 2px 8px rgba(61,110,232,0.22)) drop-shadow(0 1px 3px rgba(184,134,11,0.18))" }}>
+              <ShieldLogo size={64} />
+            </div>
+            <h1 className="font-cinzel text-5xl font-black tracking-tight leading-tight" style={{ color: "var(--text)" }}>
+              Tenant<span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gold-grad)" }}>Shield</span>
+            </h1>
+          </div>
           <p className="mt-3 text-sm leading-relaxed max-w-md mx-auto" style={{ color: "var(--text-2)" }}>
             Snap a photo or describe your housing issue. We will identify the NYC code violation and generate a formal legal letter in your language.
           </p>
@@ -113,7 +115,7 @@ export default function App() {
         <div className="grid grid-cols-[30%_1fr] gap-5 items-start">
 
           {/* Left: Issue Log */}
-          <div className="rounded-2xl sticky top-8 max-h-[calc(100vh-8rem)] flex flex-col overflow-hidden" style={{ background: "var(--card)", border: "1px solid var(--card-border)", boxShadow: "0 0 0 1px rgba(72,120,240,0.07) inset, 0 8px 32px rgba(0,0,24,0.5)" }}>
+          <div className="rounded-2xl sticky top-8 max-h-[calc(100vh-8rem)] flex flex-col overflow-hidden" style={{ background: "var(--card)", border: "1.5px solid rgba(184,134,11,0.45)", boxShadow: "var(--shadow)" }}>
             <div className="flex items-center gap-2.5 px-5 py-4 flex-shrink-0" style={{ borderBottom: "1px solid var(--card-border)" }}>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(212,175,55,0.15)" }}>
                 <svg className="w-3.5 h-3.5" style={{ color: "var(--gold-light)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -128,7 +130,7 @@ export default function App() {
           </div>
 
           {/* Right: Report */}
-          <div className="rounded-2xl p-6 md:p-8" style={{ background: "var(--card)", border: "1px solid var(--card-border)", boxShadow: "0 0 0 1px rgba(72,120,240,0.07) inset, 0 8px 32px rgba(0,0,24,0.5)" }}>
+          <div className="rounded-2xl p-6 md:p-8" style={{ background: "var(--card)", border: "1.5px solid rgba(184,134,11,0.45)", boxShadow: "var(--shadow)" }}>
             {state === "idle" || state === "loading" ? (
               <UploadForm onSubmit={handleSubmit} loading={state === "loading"} />
             ) : state === "result" && summary && pdfBlob ? (
