@@ -189,7 +189,7 @@ export default function UploadForm({ onSubmit, loading }: Props) {
             </div>
             <div className="text-center">
               <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
-                Drag &amp; drop or <span style={{ color: "var(--gold-light)" }}>browse</span>
+                Drag and drop or <span style={{ color: "var(--gold-light)" }}>browse</span>
               </p>
               <p className="text-xs mt-1" style={{ color: "var(--text-3)" }}>JPEG, PNG, WebP</p>
             </div>
@@ -291,9 +291,9 @@ export default function UploadForm({ onSubmit, loading }: Props) {
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Analyzing &amp; Generating Letter...
+            Analyzing and Generating Letter...
           </span>
-        ) : "Analyze Issue &amp; Generate Letter →"}
+        ) : "Analyze Issue and Generate Letter →"}
       </button>
     </form>
   );
