@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import UploadForm from "./components/UploadForm";
 import ResultCard from "./components/ResultCard";
+import IssueLog from "./components/IssueLog";
 import type { AnalysisSummary, Language, TenantInfo } from "./types";
 
 type AppState = "idle" | "loading" | "result" | "error";
@@ -50,7 +51,6 @@ export default function App() {
 
       if (axios.isAxiosError(err)) {
         if (err.response) {
-          // Response was a blob (error JSON from FastAPI) — read it as text
           if (err.response.data instanceof Blob) {
             try {
               const text = await err.response.data.text();
@@ -82,8 +82,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 flex items-start justify-center px-4 py-10">
-      <div className="w-full max-w-xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 px-6 py-10">
+      <div className="w-full max-w-6xl mx-auto">
+
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-blue-600 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
@@ -101,32 +102,51 @@ export default function App() {
           </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
-          {state === "idle" || state === "loading" ? (
-            <UploadForm onSubmit={handleSubmit} loading={state === "loading"} />
-          ) : state === "result" && summary && pdfBlob ? (
-            <ResultCard summary={summary} pdfBlob={pdfBlob} onReset={handleReset} />
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-4">
-                <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <div>
-                  <p className="text-sm font-semibold text-red-800">Analysis failed</p>
-                  <p className="text-sm text-red-700 mt-0.5">{errorMsg}</p>
-                </div>
-              </div>
-              <button
-                onClick={handleReset}
-                className="w-full py-3 text-sm font-semibold text-blue-600 hover:text-blue-800 border border-blue-200 hover:border-blue-400 rounded-xl transition-colors"
-              >
-                Try Again
-              </button>
+        {/* Split layout */}
+        <div className="grid grid-cols-[30%_1fr] gap-5 items-start">
+
+          {/* Left: Issue Log */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 sticky top-8 max-h-[calc(100vh-8rem)] flex flex-col">
+            <div className="flex items-center gap-2 mb-4 flex-shrink-0">
+              <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <h2 className="text-sm font-bold text-gray-800">Issue Log</h2>
             </div>
-          )}
+            <div className="overflow-y-auto flex-1 -mr-1 pr-1">
+              <IssueLog />
+            </div>
+          </div>
+
+          {/* Right: Report */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
+            {state === "idle" || state === "loading" ? (
+              <UploadForm onSubmit={handleSubmit} loading={state === "loading"} />
+            ) : state === "result" && summary && pdfBlob ? (
+              <ResultCard summary={summary} pdfBlob={pdfBlob} onReset={handleReset} />
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-4">
+                  <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-semibold text-red-800">Analysis failed</p>
+                    <p className="text-sm text-red-700 mt-0.5">{errorMsg}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleReset}
+                  className="w-full py-3 text-sm font-semibold text-blue-600 hover:text-blue-800 border border-blue-200 hover:border-blue-400 rounded-xl transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* Footer */}
@@ -141,6 +161,7 @@ export default function App() {
             NYC HPD
           </a>
         </p>
+
       </div>
     </div>
   );

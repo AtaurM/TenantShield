@@ -16,6 +16,14 @@ export interface AnalysisSummary {
   remediation: string;
 }
 
+export interface LogEntry {
+  id: string;
+  timestamp: string;
+  description: string;
+  imageDataUrl?: string;
+  imageName?: string;
+}
+
 export const LANGUAGES = [
   "English",
   "Spanish",

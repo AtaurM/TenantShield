@@ -1,5 +1,23 @@
 import React, { useCallback, useRef, useState } from "react";
-import { LANGUAGES, type Language, type TenantInfo } from "../types";
+import { LANGUAGES, type Language, type LogEntry, type TenantInfo } from "../types";
+
+const LOG_STORAGE_KEY = "tenantshield_log";
+
+function loadLogImages(): LogEntry[] {
+  try {
+    const raw = localStorage.getItem(LOG_STORAGE_KEY);
+    const entries: LogEntry[] = raw ? JSON.parse(raw) : [];
+    return entries.filter((e) => !!e.imageDataUrl);
+  } catch {
+    return [];
+  }
+}
+
+async function dataUrlToFile(dataUrl: string, filename: string): Promise<File> {
+  const res = await fetch(dataUrl);
+  const blob = await res.blob();
+  return new File([blob], filename || "log-image.jpg", { type: blob.type });
+}
 
 interface Props {
   onSubmit: (image: File | null, complaint: string, language: Language, info: TenantInfo) => void;
@@ -36,10 +54,12 @@ const inputClass =
 export default function UploadForm({ onSubmit, loading }: Props) {
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
   const [complaint, setComplaint] = useState("");
   const [language, setLanguage] = useState<Language>("English");
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [logImages] = useState<LogEntry[]>(loadLogImages);
 
   const [info, setInfo] = useState<TenantInfo>({
     tenant_name: "",
@@ -58,6 +78,16 @@ export default function UploadForm({ onSubmit, loading }: Props) {
     if (!file.type.startsWith("image/")) return;
     setImage(file);
     setPreview(URL.createObjectURL(file));
+    setSelectedLogId(null);
+  };
+
+  const selectLogImage = async (entry: LogEntry) => {
+    if (!entry.imageDataUrl) return;
+    const file = await dataUrlToFile(entry.imageDataUrl, entry.imageName ?? "log-image.jpg");
+    setImage(file);
+    setPreview(entry.imageDataUrl);
+    setSelectedLogId(entry.id);
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   const onDrop = useCallback((e: React.DragEvent) => {
@@ -75,6 +105,7 @@ export default function UploadForm({ onSubmit, loading }: Props) {
   const clearImage = () => {
     setImage(null);
     setPreview(null);
+    setSelectedLogId(null);
     if (inputRef.current) inputRef.current.value = "";
   };
 
@@ -102,6 +133,35 @@ export default function UploadForm({ onSubmit, loading }: Props) {
           Photo of the Issue{" "}
           <span className="font-normal text-gray-400">(optional if describing below)</span>
         </label>
+
+        {/* Log image picker */}
+        {logImages.length > 0 && (
+          <div className="mb-3">
+            <p className="text-xs text-gray-400 mb-2">From your log</p>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {logImages.map((entry) => (
+                <button
+                  key={entry.id}
+                  type="button"
+                  onClick={() => selectLogImage(entry)}
+                  className={`
+                    flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all
+                    ${selectedLogId === entry.id
+                      ? "border-blue-500 ring-2 ring-blue-300"
+                      : "border-gray-200 hover:border-blue-400"
+                    }
+                  `}
+                >
+                  <img
+                    src={entry.imageDataUrl}
+                    alt={entry.description || "Log entry"}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {!preview ? (
           <div
