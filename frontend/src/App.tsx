@@ -1,9 +1,10 @@
-﻿import { useState } from "react";
+﻿import React, { useState } from "react";
 import axios from "axios";
 import UploadForm from "./components/UploadForm";
 import ResultCard from "./components/ResultCard";
 import IssueLog from "./components/IssueLog";
-import type { AnalysisSummary, Language, TenantInfo } from "./types";
+import ReportsLog from "./components/ReportsLog";
+import type { AnalysisSummary, Language, ReportEntry, TenantInfo } from "./types";
 
 type AppState = "idle" | "loading" | "result" | "error";
 
@@ -31,11 +32,19 @@ function ShieldLogo({ size = 64 }: { size?: number }) {
   );
 }
 
+const PANEL_STYLE = {
+  background: "var(--card)",
+  border: "1.5px solid rgba(184,134,11,0.45)",
+  boxShadow: "var(--shadow)",
+};
+
 export default function App() {
   const [state, setState] = useState<AppState>("idle");
   const [summary, setSummary] = useState<AnalysisSummary | null>(null);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [reports, setReports] = useState<ReportEntry[]>([]);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
   const handleSubmit = async (image: File | null, complaint: string, language: Language, info: TenantInfo) => {
     setState("loading");
@@ -58,9 +67,20 @@ export default function App() {
       const rawHeader = response.headers["x-analysis-summary"];
       if (!rawHeader) throw new Error("Missing analysis summary from server.");
       const parsed: AnalysisSummary = JSON.parse(decodeURIComponent(rawHeader));
+      const blob = new Blob([response.data], { type: "application/pdf" });
       setSummary(parsed);
-      setPdfBlob(new Blob([response.data], { type: "application/pdf" }));
+      setPdfBlob(blob);
       setState("result");
+
+      // Save to reports log and auto-select
+      const entry: ReportEntry = {
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        summary: parsed,
+        pdfUrl: URL.createObjectURL(new Blob([response.data], { type: "application/pdf" })),
+      };
+      setReports((prev) => [entry, ...prev]);
+      setSelectedReportId(entry.id);
     } catch (err: unknown) {
       let message = "Something went wrong. Please try again.";
       if (axios.isAxiosError(err)) {
@@ -87,10 +107,24 @@ export default function App() {
 
   const handleReset = () => { setState("idle"); setSummary(null); setPdfBlob(null); setErrorMsg(""); };
 
+  const panelHeader = (icon: React.ReactNode, title: string, badge?: number) => (
+    <div className="flex items-center gap-2.5 px-5 py-4 flex-shrink-0" style={{ borderBottom: "1px solid var(--card-border)" }}>
+      <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(184,134,11,0.12)" }}>
+        {icon}
+      </div>
+      <h2 className="text-sm font-bold" style={{ color: "var(--text)" }}>{title}</h2>
+      {badge !== undefined && badge > 0 && (
+        <span className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(61,110,232,0.1)", color: "var(--royal)" }}>
+          {badge}
+        </span>
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen px-6 py-10" style={{ background: "var(--bg)" }}>
       <div className="pointer-events-none fixed inset-0" style={{ background: "radial-gradient(ellipse 70% 35% at 50% -5%, rgba(61,110,232,0.1) 0%, transparent 68%)" }} />
-      <div className="relative w-full max-w-6xl mx-auto">
+      <div className="relative w-full max-w-[1380px] mx-auto">
 
         {/* Header */}
         <div className="text-center mb-10">
@@ -111,26 +145,24 @@ export default function App() {
           </p>
         </div>
 
-        {/* Split layout */}
-        <div className="grid grid-cols-[30%_1fr] gap-5 items-start">
+        {/* 3-column layout */}
+        <div className="grid grid-cols-[20%_1fr_32%] gap-5 items-start">
 
-          {/* Left: Issue Log */}
-          <div className="rounded-2xl sticky top-8 max-h-[calc(100vh-8rem)] flex flex-col overflow-hidden" style={{ background: "var(--card)", border: "1.5px solid rgba(184,134,11,0.45)", boxShadow: "var(--shadow)" }}>
-            <div className="flex items-center gap-2.5 px-5 py-4 flex-shrink-0" style={{ borderBottom: "1px solid var(--card-border)" }}>
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(212,175,55,0.15)" }}>
-                <svg className="w-3.5 h-3.5" style={{ color: "var(--gold-light)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <h2 className="text-sm font-bold" style={{ color: "var(--text)" }}>Issue Log</h2>
-            </div>
+          {/* Col 1: Issue Log */}
+          <div className="rounded-2xl sticky top-8 max-h-[calc(100vh-8rem)] flex flex-col overflow-hidden" style={PANEL_STYLE}>
+            {panelHeader(
+              <svg className="w-3.5 h-3.5" style={{ color: "var(--gold)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>,
+              "Issue Log"
+            )}
             <div className="overflow-y-auto flex-1 p-5 scroll-royal">
               <IssueLog />
             </div>
           </div>
 
-          {/* Right: Report */}
-          <div className="rounded-2xl p-6 md:p-8" style={{ background: "var(--card)", border: "1.5px solid rgba(184,134,11,0.45)", boxShadow: "var(--shadow)" }}>
+          {/* Col 2: Report Form */}
+          <div className="rounded-2xl p-6 md:p-8" style={PANEL_STYLE}>
             {state === "idle" || state === "loading" ? (
               <UploadForm onSubmit={handleSubmit} loading={state === "loading"} />
             ) : state === "result" && summary && pdfBlob ? (
@@ -153,6 +185,22 @@ export default function App() {
             )}
           </div>
 
+          {/* Col 3: Reports Log */}
+          <div className="rounded-2xl sticky top-8 max-h-[calc(100vh-8rem)] flex flex-col overflow-hidden" style={PANEL_STYLE}>
+            {panelHeader(
+              <svg className="w-3.5 h-3.5" style={{ color: "var(--gold)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>,
+              "Reports",
+              reports.length
+            )}
+            <ReportsLog
+              reports={reports}
+              selectedId={selectedReportId}
+              onSelect={setSelectedReportId}
+            />
+          </div>
+
         </div>
 
         {/* Footer */}
@@ -165,3 +213,4 @@ export default function App() {
     </div>
   );
 }
+

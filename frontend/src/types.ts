@@ -24,6 +24,13 @@ export interface LogEntry {
   imageName?: string;
 }
 
+export interface ReportEntry {
+  id: string;
+  timestamp: string;
+  summary: AnalysisSummary;
+  pdfUrl: string;
+}
+
 export const LANGUAGES = [
   "English",
   "Spanish",
