@@ -177,7 +177,7 @@ def generate_letter_pdf(analysis: dict, tenant_info: dict | None = None) -> byte
     story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#E5E7EB")))
 
     # Formal Letter
-    story.append(Paragraph("Formal Complaint Letter", section_header_style))
+    story.append(Paragraph("Complaint Letter", section_header_style))
 
     letter_text = analysis.get("letter", "")
     for paragraph in letter_text.split("\n"):

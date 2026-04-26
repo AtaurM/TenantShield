@@ -71,7 +71,7 @@ export default function ResultCard({ summary, pdfBlob, onReset }: Props) {
         </div>
         <div>
           <p className="text-sm font-semibold" style={{ color: "#4ade80" }}>Analysis complete</p>
-          <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.6)" }}>Your formal complaint letter is ready to download.</p>
+          <p className="text-xs mt-0.5" style={{ color: "rgba(74,222,128,0.6)" }}>Your complaint letter is ready to download.</p>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export default function ResultCard({ summary, pdfBlob, onReset }: Props) {
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        Download Formal Letter (PDF)
+        Download Complaint Letter (PDF)
       </button>
 
       {/* Next steps */}

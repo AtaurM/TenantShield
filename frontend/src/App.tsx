@@ -141,7 +141,7 @@ export default function App() {
             </h1>
           </div>
           <p className="mt-3 text-sm leading-relaxed max-w-md mx-auto" style={{ color: "var(--text-2)" }}>
-            Snap a photo or describe your housing issue. We will identify the NYC code violation and generate a formal legal letter in your language.
+            Snap a photo or describe your housing issue. We will identify the NYC code violation and generate a complaint letter in your language.
           </p>
         </div>
 

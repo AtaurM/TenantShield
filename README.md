@@ -1,6 +1,6 @@
 # TenantShield
 
-NYC Housing Rights complaint assistant. Upload a photo of a housing issue or describe it in text — get back the relevant NYC housing code violation and a formal legal letter in your language.
+NYC Housing Rights complaint assistant. Upload a photo of a housing issue or describe it in text — get back the relevant NYC housing code violation and a complaint letter in your language.
 
 ## Setup
 

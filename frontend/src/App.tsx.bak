@@ -113,7 +113,7 @@ export default function App() {
           </h1>
           <p className="mt-3 text-slate-400 text-sm leading-relaxed max-w-md mx-auto">
             Snap a photo or describe your housing issue. We'll identify the NYC code violations
-            and generate a formal legal letter in your language.
+            and generate a complaint letter in your language.
           </p>
         </div>
 
