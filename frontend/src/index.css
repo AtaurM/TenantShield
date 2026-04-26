@@ -4,14 +4,53 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg:           #07102b;
+  --card:         #0c1d50;
+  --card-alt:     #091440;
+  --card-border:  rgba(72, 120, 240, 0.22);
+  --royal:        #3d6ee8;
+  --royal-light:  #6690f0;
+  --royal-dark:   #1e3fa8;
+  --gold:         #d4af37;
+  --gold-light:   #f0cf65;
+  --gold-dark:    #a8861a;
+  --gold-grad:    linear-gradient(135deg, #b8860b 0%, #f0cf65 50%, #c49b1e 100%);
+  --gold-grad-btn: linear-gradient(135deg, #c49b1e 0%, #f5d060 100%);
+  --input-bg:     #081230;
+  --input-border: #1a3070;
+  --text:         #dde7ff;
+  --text-2:       #7899d4;
+  --text-3:       #3d5999;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  background-color: #F0F4F8;
-  color: #1F2937;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
   min-height: 100vh;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+/* Custom scrollbar for the log panel */
+.scroll-royal::-webkit-scrollbar {
+  width: 4px;
+}
+.scroll-royal::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-royal::-webkit-scrollbar-thumb {
+  background: var(--input-border);
+  border-radius: 2px;
+}
+.scroll-royal::-webkit-scrollbar-thumb:hover {
+  background: var(--royal-dark);
 }
