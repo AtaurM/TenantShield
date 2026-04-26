@@ -1,0 +1,147 @@
+import { useState } from "react";
+import axios from "axios";
+import UploadForm from "./components/UploadForm";
+import ResultCard from "./components/ResultCard";
+import type { AnalysisSummary, Language, TenantInfo } from "./types";
+
+type AppState = "idle" | "loading" | "result" | "error";
+
+export default function App() {
+  const [state, setState] = useState<AppState>("idle");
+  const [summary, setSummary] = useState<AnalysisSummary | null>(null);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (
+    image: File | null,
+    complaint: string,
+    language: Language,
+    info: TenantInfo
+  ) => {
+    setState("loading");
+    setErrorMsg("");
+
+    const formData = new FormData();
+    if (image) formData.append("image", image);
+    if (complaint.trim()) formData.append("complaint_text", complaint.trim());
+    formData.append("language", language);
+    formData.append("tenant_name", info.tenant_name);
+    formData.append("tenant_address", info.tenant_address);
+    formData.append("tenant_unit", info.tenant_unit);
+    formData.append("landlord_name", info.landlord_name);
+    formData.append("landlord_address", info.landlord_address);
+    formData.append("letter_date", info.letter_date);
+
+    try {
+      const response = await axios.post("/api/analyze", formData, {
+        responseType: "blob",
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      const rawHeader = response.headers["x-analysis-summary"];
+      if (!rawHeader) throw new Error("Missing analysis summary from server.");
+
+      const parsed: AnalysisSummary = JSON.parse(decodeURIComponent(rawHeader));
+      setSummary(parsed);
+      setPdfBlob(new Blob([response.data], { type: "application/pdf" }));
+      setState("result");
+    } catch (err: unknown) {
+      let message = "Something went wrong. Please try again.";
+
+      if (axios.isAxiosError(err)) {
+        if (err.response) {
+          // Response was a blob (error JSON from FastAPI) — read it as text
+          if (err.response.data instanceof Blob) {
+            try {
+              const text = await err.response.data.text();
+              const parsed = JSON.parse(text);
+              message = parsed.detail ?? message;
+            } catch {
+              // ignore parse failure
+            }
+          } else if (err.response.data?.detail) {
+            message = err.response.data.detail;
+          }
+        } else if (err.message) {
+          message = err.message;
+        }
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+
+      setErrorMsg(message);
+      setState("error");
+    }
+  };
+
+  const handleReset = () => {
+    setState("idle");
+    setSummary(null);
+    setPdfBlob(null);
+    setErrorMsg("");
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-blue-50 flex items-start justify-center px-4 py-10">
+      <div className="w-full max-w-xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 bg-blue-600 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clipRule="evenodd" />
+            </svg>
+            NYC Housing Rights
+          </div>
+          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+            Tenant<span className="text-blue-600">Shield</span>
+          </h1>
+          <p className="mt-2 text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
+            Snap a photo or describe your housing issue. We'll identify the NYC
+            code violation and generate a formal legal letter — in your language.
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
+          {state === "idle" || state === "loading" ? (
+            <UploadForm onSubmit={handleSubmit} loading={state === "loading"} />
+          ) : state === "result" && summary && pdfBlob ? (
+            <ResultCard summary={summary} pdfBlob={pdfBlob} onReset={handleReset} />
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-4">
+                <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-semibold text-red-800">Analysis failed</p>
+                  <p className="text-sm text-red-700 mt-0.5">{errorMsg}</p>
+                </div>
+              </div>
+              <button
+                onClick={handleReset}
+                className="w-full py-3 text-sm font-semibold text-blue-600 hover:text-blue-800 border border-blue-200 hover:border-blue-400 rounded-xl transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-xs text-gray-400 mt-6">
+          For informational purposes only. Not legal advice.{" "}
+          <a
+            href="https://www.nyc.gov/site/hpd/index.page"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-gray-600"
+          >
+            NYC HPD
+          </a>
+        </p>
+      </div>
+    </div>
+  );
+}
